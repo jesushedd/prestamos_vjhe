@@ -1,0 +1,5 @@
+RewriteEngine on
+# Si la ruta empieza por "test/", no redirigir
+RewriteCond %{REQUEST_URI} !^/test
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php  
