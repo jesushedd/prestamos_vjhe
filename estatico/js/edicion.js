@@ -1,6 +1,7 @@
 
 const INPUTS_EDITABLES = document.querySelectorAll('form .editando');
-const ID_A_EDITAR = null;
+const ID_A_EDITAR = document.querySelector('#editando_id');
+const NUMERO_CAMPOS_EDITABLES = INPUTS_EDITABLES.length;
 
 
 
@@ -21,16 +22,13 @@ document.querySelector('tbody').addEventListener('click', function (event) {
 
 
     // Llenar los inputs con los valores correspondientes
-    for (let i = 0; i < celdas.length ; i++) {
+    for (let i = 0; i < NUMERO_CAMPOS_EDITABLES; i++) {
         INPUTS_EDITABLES[i].value = celdas[i].innerText.trim();
     }
 
-    // También llenar el input hidden del ID (columna 0)
+    // También llenar el input hidden
     const id = filaClicada.children[0].innerText.trim();
-    const inputId = document.getElementById('editando_id');
-    if (inputId) {
-        inputId.value = id;
-    }
+    ID_A_EDITAR.value = id;
 });
 
 
@@ -45,6 +43,10 @@ document.addEventListener('click', function (event) {
         document.querySelectorAll('tbody .table-warning').forEach(tr => {
             tr.classList.remove('table-warning');
         });
+        //Quitar los valores del formulario editar
+        for (let i = 0; i < NUMERO_CAMPOS_EDITABLES; i++) {
+            INPUTS_EDITABLES[i].value = "";
+        }
     }
 });
 
