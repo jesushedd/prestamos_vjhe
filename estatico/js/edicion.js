@@ -17,6 +17,9 @@ document.querySelector('tbody').addEventListener('click', function (event) {
         }
     });
 
+    let celdas = filaClicada.querySelectorAll('.editable');
+    console.log(celdas);
+
 
     // Llenar los inputs con los valores correspondientes
     for (let i = 0; i < celdas.length ; i++) {
