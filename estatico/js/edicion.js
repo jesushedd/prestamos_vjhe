@@ -1,12 +1,15 @@
 
 const INPUTS_EDITABLES = document.querySelectorAll('form .editando');
-const ID_A_EDITAR = document.querySelector('#editando_id');
+let ID_ENTIDAD_SELECCIONADA = null; //= document.querySelector('#editando_id');
+const FORM_ID_EDITAR  = document.querySelector('#editando_id');
 const NUMERO_CAMPOS_EDITABLES = INPUTS_EDITABLES.length;
+const TABLA_CLASE1 = document.querySelector("tbody.clase-1")
 
 
 
-document.querySelector('tbody').addEventListener('click', function (event) {
+TABLA_CLASE1.addEventListener('click', function (event) {
     const filaClicada = event.target.closest('tr');
+    console.log("EDITAR");
 
     if (!filaClicada) return;
 
@@ -28,14 +31,17 @@ document.querySelector('tbody').addEventListener('click', function (event) {
 
     // También llenar el input hidden
     const id = filaClicada.children[0].innerText.trim();
-    ID_A_EDITAR.value = id;
+    ID_ENTIDAD_SELECCIONADA = id;
+    FORM_ID_EDITAR.value = id;
 });
 
 
 
 document.addEventListener('click', function (event) {
-    const dentroDeTabla = event.target.closest('tbody');
+    const dentroDeTabla = event.target.closest('tbody.clase-1');
     const dentroDeFormulario = event.target.closest('.formulario-editar');
+
+
 
     // Si no está ni en la tabla ni en el form de edición
     if (!dentroDeTabla && !dentroDeFormulario) {
@@ -47,6 +53,10 @@ document.addEventListener('click', function (event) {
         for (let i = 0; i < NUMERO_CAMPOS_EDITABLES; i++) {
             INPUTS_EDITABLES[i].value = "";
         }
+        //quitar id ditable/ sleccionado
+        ID_ENTIDAD_SELECCIONADA = null;
+        FORM_ID_EDITAR.value = "";
+        
     }
 });
 

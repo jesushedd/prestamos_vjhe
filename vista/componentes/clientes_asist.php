@@ -4,6 +4,7 @@
     <h2>Resumen - Clientes</h2>
     <section class="add-actualizar">
         <script src="<?= ROOT_ROUTE . 'estatico/js/edicion.js' ?>" defer></script>
+        <script src="<?= ROOT_ROUTE . 'estatico/js/ajax.js' ?>" defer></script>
         <div class="container">
             <div class="row">
                 <!-- Informacion sobre los prestamos del cliente TODO -->
@@ -12,7 +13,16 @@
                         <caption>Prestamos del Cliente</caption>
                         <thead class="table-dark">
                             <th>id</th>
+                            <th>monto</th>
+                            <th>Fecha de Inicio</th>
+                            <th>Numero de Plazos</th>
+                            <th>Interés Anual</th>
+                            <th>Estado</th>
                         </thead>
+                        <tbody class="clase-2">
+
+
+                        </tbody>
 
                     </table>
                 </div>
@@ -33,7 +43,7 @@
                 <th>Teléfono</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="clase-1">
             <?php foreach ($CLIENTES as $cliente): ?>
                 <tr>
                     <td><?= htmlspecialchars($cliente->id) ?></td>
