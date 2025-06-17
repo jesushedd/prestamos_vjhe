@@ -12,7 +12,7 @@
 </head>
 <body>
     <?php 
-    require $COMPONENTES . 'header.php';
+    require $HEADER;
     require $SUBVISTA;
     ?>
 

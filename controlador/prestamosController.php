@@ -2,11 +2,11 @@
 
 $CONFIG = __DIR__. '/config/';
 
-require $CONFIG . 'init.php';
+require_once $CONFIG . 'init.php';
 
-require ROOT_DIR . 'config/conexion.php';
-require ROOT_DIR . 'modelo/ClienteModelo.php';
-require ROOT_DIR . 'modelo/PrestamoModelo.php';
+require_once ROOT_DIR . 'config/conexion.php';
+require_once ROOT_DIR . 'modelo/ClienteModelo.php';
+require_once ROOT_DIR . 'modelo/PrestamoModelo.php';
 
 if (isset($_POST['id'])) {
     $conexion = conectar();
