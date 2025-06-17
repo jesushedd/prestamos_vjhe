@@ -3,6 +3,7 @@
 
     <h2>Administrar Clientes</h2>
     <section class="add-actualizar">
+        <script src="<?= ROOT_ROUTE . 'estatico/js/edicion.js' ?>" defer></script>
         <div class="container">
             <div class="row">
                 <!-- Formulario: Registrar Nuevo Cliente -->
@@ -45,14 +46,15 @@
                         </form>
                     </div>
                 </div>
-
+                <!-- Formulario: Editar Cliente -->
                 <div class="card mb-4 col formulario-editar">
                     <div class="card-header bg-warning text-dark">
                         Editar Cliente
                     </div>
                     <div class="card-body">
+
                         <form method="POST">
-                            <input type="hidden" name="editando_id" id="editando_id"  value="">
+                            <input type="hidden" name="editando_id" id="editando_id" value="">
 
                             <div class="mb-3">
                                 <label for="editando_nombre" class="form-label">Nombre</label>
@@ -78,7 +80,7 @@
                                     name="editando_email" required>
                             </div>
 
-                        
+
 
                             <div class="mb-3">
                                 <label for="editando_direccion" class="form-label">Dirección</label>
@@ -96,7 +98,16 @@
                         </form>
                     </div>
                 </div>
+                <!-- Informacion sobre los prestamos del cliente TODO -->
+                <div class="card col">
+                    <table class="table table-striped table-bordered">
+                        <caption>Prestamos del Cliente</caption>
+                        <thead class="table-dark">
+                            <th>id</th>
+                        </thead>
 
+                    </table>
+                </div>
             </div>
         </div>
     </section>
@@ -122,7 +133,7 @@
                     <td class="editable"><?= htmlspecialchars($cliente->apellido) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->dni) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->email) ?></td>
-                    <td><?= htmlspecialchars($cliente->fecha_creacion->format('Y-m-d')) ?></td>
+                    <td><?= htmlspecialchars($cliente->str_fecha()) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->direccion) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->telefono) ?></td>
                 </tr>

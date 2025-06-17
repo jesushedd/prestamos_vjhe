@@ -8,7 +8,7 @@
     <?php 
     require $CONFIG . 'links.php';
     ?>
-    <script src="<?= ROOT_ROUTE . 'estatico/js/edicion.js' ?>" defer></script>
+    
 </head>
 <body>
     <?php 
