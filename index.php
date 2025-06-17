@@ -28,6 +28,9 @@ switch ($request) {
     case ROOT_ROUTE . 'prestamos':
         require $CONTROLADOR_DIR . 'prestamosController.php';
         break;
+    case ROOT_ROUTE . 'usuarios':
+        require $CONTROLADOR_DIR . 'usuariosController.php';
+        break;
 
     default:
         echo $request;

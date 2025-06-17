@@ -13,7 +13,7 @@
                         <a class="nav-link active" aria-current="page" href="<?= ROOT_ROUTE . 'clientes' ?>">Clientes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?= ROOT_ROUTE . 'usarios' ?>">Usuarios</a>
+                        <a class="nav-link active" aria-current="page" href="<?= ROOT_ROUTE . 'usuarios' ?>">Usuarios</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

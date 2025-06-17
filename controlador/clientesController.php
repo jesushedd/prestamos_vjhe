@@ -11,9 +11,7 @@ require_once $CONFIG . 'init.php';
 
 $repo_clientes = new ClienteRepositorio(conectar());
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location:  " . ROOT_ROUTE . 'home');
-}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //cchecar el tipo de usuario

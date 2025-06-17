@@ -1,19 +1,20 @@
-
-
 <?php
-class TipoUsuario {
+class TipoUsuario
+{
     public int $id;
     public string $nombre_tipo;
 
-    public function  __construct(string $nombre){
-        $this->nombre_tipo=$nombre;
-        $this->id=-1;
+    public function __construct(string $nombre)
+    {
+        $this->nombre_tipo = $nombre;
+        $this->id = -1;
     }
 }
 
 
 
-class Usuario {
+class Usuario
+{
     public int $id;
     public string $nombre;
     public string $apellido;
@@ -25,28 +26,63 @@ class Usuario {
 
     public TipoUsuario $tipo_usuario;
 
-    public function __construct(string $nombre, string $apellido, string $dni, TipoUsuario $tipo_usuario) {
+    public function __construct(string $nombre, string $apellido, string $dni, TipoUsuario $tipo_usuario)
+    {
         //datos base
-        $this->nombre= $nombre;
-        $this->apellido= $apellido;
-        $this->dni=$dni;
+        $this->nombre = $nombre;
+        $this->apellido = $apellido;
+        $this->dni = $dni;
         //acceso a dato
         $this->id = -1;  // id sin asignar
         $this->tipo_usuario = $tipo_usuario;
     }
+
+    public function set_password(string $pssws){
+        $this->password = password_hash($pssws, PASSWORD_DEFAULT);
+    }
 }
 
-class UsuarioRepositorio {
+class UsuarioRepositorio
+{
     private $conexion;
     private $tabla_usuario = 'usuarios';
     private $tabla_personas = 'personas';
     private $tabla_tipo_usuarios = 'tipos_usuarios';
 
-    public function __construct($conexion) {
+    public function __construct($conexion)
+    {
         $this->conexion = $conexion;
     }
 
-    public function obtener_tipo_por_id(int $id){
+
+    public function obtener_todos()
+    {
+        $stmt = $this->conexion->prepare(
+            "SELECT * FROM $this->tabla_usuario
+            JOIN $this->tabla_personas 
+            ON $this->tabla_usuario.id = $this->tabla_personas.id"
+        );
+        $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $usuarios = [];
+        foreach ($resultado as $fila) {
+            $tipo = $this->obtener_tipo_por_id($fila['id_tipo_usuario']);
+            $usuario = new Usuario(
+                $fila['nombre'],
+                $fila['apellido'],
+                $fila['dni'],
+                $tipo
+            );
+            $usuario->id = $fila['id'];
+            $usuario->nombre_usuario = $fila['nombre_usuario'];
+            $usuario->password = $fila['password'];
+            $usuarios[] = $usuario;
+        }
+        return $usuarios;
+    }
+
+    public function obtener_tipo_por_id(int $id)
+    {
         $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_tipo_usuarios WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -59,11 +95,12 @@ class UsuarioRepositorio {
         die('No se encontro el id del tipo de usuario');//TODO
     }
 
-    public function obtener_usuarios_por_tipo(TipoUsuario $tipo): array {
+    public function obtener_usuarios_por_tipo(TipoUsuario $tipo): array
+    {
         $id_tipo = $tipo->id;
-        if ( $tipo->id === -1) {
+        if ($tipo->id === -1) {
             die("Tipo no existente");
-        } 
+        }
         /*      
         echo "SELECT * FROM $this->tabla_usuario
                                             JOIN $this->tabla_personas ON $this->tabla_usuario.id=$this->tabla_personas.id
@@ -78,12 +115,12 @@ class UsuarioRepositorio {
 
         $usuarios = [];
 
-        
+
         foreach ($resultados as $fila) {
-            
+
             $usuario = new Usuario($fila['nombre'], $fila['apellido'], $fila['dni'], $tipo);
             $usuario->nombre_usuario = $fila['nombre_usuario'];
-        
+
             $usuario->password = $fila['password'];
 
             $usuario->id = $fila["id"];
@@ -93,7 +130,23 @@ class UsuarioRepositorio {
         return $usuarios;
     }
 
-    public function obtener_usuario_por_id(int $id) : Usuario | null{
+    public function obtener_tipos(): array
+    {
+        $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_tipo_usuarios");
+        $stmt->execute();
+        $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tipos = [];
+        foreach ($resultados as $fila) {
+            $tipo = new TipoUsuario($fila['nombre_tipo']);
+            $tipo->id = $fila['id'];
+            $tipos[] = $tipo;
+        }
+        return $tipos;
+    }
+
+    public function obtener_usuario_por_id(int $id): Usuario|null
+    {
         $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_usuario
                                             JOIN $this->tabla_personas ON $this->tabla_usuario.id=$this->tabla_personas.id
                                             WHERE $this->tabla_personas.id = :id");
@@ -103,19 +156,20 @@ class UsuarioRepositorio {
         if ($resultado) {
             $tipo_usuario = $this->obtener_tipo_por_id($resultado['id_tipo_usuario']);
             $usuario = new Usuario($resultado['nombre'], $resultado['apellido'], $resultado['dni'], $tipo_usuario);
-            
+
             $usuario->nombre_usuario = $resultado['nombre_usuario'];
             $usuario->password = $resultado['password'];
-            $usuario->id=$resultado['id'];
+            $usuario->id = $resultado['id'];
 
             return $usuario;
         }
         return null;
-        
-        
+
+
     }
 
-    public function usuario_por_nombre(string $nombre) : Usuario | null {
+    public function usuario_por_nombre(string $nombre): Usuario|null
+    {
         $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_usuario
                                             JOIN $this->tabla_personas ON $this->tabla_usuario.id=$this->tabla_personas.id
                                             WHERE nombre_usuario = :nombre_usuario");
@@ -124,20 +178,21 @@ class UsuarioRepositorio {
 
         if ($resultado) {
             $id_usuario = $resultado['id'];
-            
+
             $usuario = $this->obtener_usuario_por_id($id_usuario);
 
             return $usuario;
         }
         return null;
-        
-        
-        
+
+
+
     }
 
-    
 
-    public function crear(Usuario $usuario): int {
+
+    public function crear(Usuario $usuario): int
+    {
         if ($usuario->id != -1) {
             die("Usuario ya existente.");
         }
@@ -158,8 +213,8 @@ class UsuarioRepositorio {
                         VALUES (:nombre, :apellido, :dni)");
             $result = $stmt->execute([
                 'nombre' => $usuario->nombre,
-                'apellido'=> $usuario->apellido,
-                'dni'=> $usuario->dni
+                'apellido' => $usuario->apellido,
+                'dni' => $usuario->dni
             ]);
             //crear usuario con el id obtenido al crear la persona
             $id_creado = $this->conexion->lastInsertId();
@@ -168,7 +223,7 @@ class UsuarioRepositorio {
                                                 VALUES (:id, :id_tipo_usuario, :nombre_usuario, :password)");
             $result = $stmt->execute([
                 'id' => $id_creado,
-                'id_tipo_usuario'=> $usuario->tipo_usuario->id,
+                'id_tipo_usuario' => $usuario->tipo_usuario->id,
                 'nombre_usuario' => $usuario->nombre_usuario,
                 'password' => $usuario->password
             ]);
@@ -184,7 +239,10 @@ class UsuarioRepositorio {
         }
     }
 
-    public function actualizar(Usuario $usuario): bool {
+    
+
+    public function actualizar(Usuario $usuario): bool
+    {
         if ($usuario->id === -1) {
             die("Usuario no existente .");
         }
@@ -199,29 +257,29 @@ class UsuarioRepositorio {
 
             $stmt->execute([
                 'nombre' => $usuario->nombre,
-                'apellido'=> $usuario->apellido,
-                'dni'=> $usuario->dni
+                'apellido' => $usuario->apellido,
+                'dni' => $usuario->dni
             ]);
-             if ($stmt->rowCount() != 1 ){
+            if ($stmt->rowCount() != 1) {
                 $this->conexion->rollBack();
                 echo ("Error al match id del usuario a actualizar");
                 return false;
-             }
+            }
             //actualizar tipo de usuario
-           
+
 
             $stmt = $this->conexion->prepare("UPDATE $this->tabla_usuario  
                                             SET id_tipo_usuario=:id_tipo
                                             WHERE id=:id_usuario");
             $stmt->execute([
                 'id_usuario' => $usuario->id,
-                'id_tipo'=> $usuario->tipo_usuario->id
+                'id_tipo' => $usuario->tipo_usuario->id
             ]);
-            if ($stmt->rowCount() != 1 ){
+            if ($stmt->rowCount() != 1) {
                 $this->conexion->rollBack();
                 echo ("Error al match id del usuario a actualizar");
                 return false;
-             }
+            }
 
             $this->conexion->commit();
 
@@ -232,7 +290,8 @@ class UsuarioRepositorio {
         }
     }
 
-    public function eliminar(Usuario $usuario): bool {
+    public function eliminar(Usuario $usuario): bool
+    {
         if ($usuario->id === -1) {
             die("Usuario no existente.");
         }
@@ -246,7 +305,7 @@ class UsuarioRepositorio {
             ]);
             if ($stmt->rowCount() != 1) {
                 $this->conexion->rollBack();
-                echo("Error al matchear id al eliminar usuario");
+                echo ("Error al matchear id al eliminar usuario");
                 return false;
             }
             //eliminar de personas
@@ -256,21 +315,21 @@ class UsuarioRepositorio {
             ]);
             if ($stmt->rowCount() != 1) {
                 $this->conexion->rollBack();
-                echo("Error al matchear id al eliminar usuario");
+                echo ("Error al matchear id al eliminar usuario");
                 return false;
             }
 
-            $usuario->id=-1;
+            $usuario->id = -1;
             $this->conexion->commit();
             return true;
 
 
         } catch (PDOException $e) {
             $this->conexion->rollBack();
-            die("error al eliminar usuario". $e->getMessage());
+            die("error al eliminar usuario" . $e->getMessage());
         }
-        
-        
+
+
     }
 }
 ?>
