@@ -1,6 +1,8 @@
 <?php
 
 require_once ROOT_DIR . 'modelo/PrestamoModelo.php';
+require_once ROOT_DIR . 'modelo/PrestamoModelo.php';
+
 class Pago
 {
     public int $id;
@@ -10,19 +12,24 @@ class Pago
     public float $pago_total;
     public float $restante_pago_principal;
     public DateTime $fecha_pago;
+    public string $estado;
 
     public function __construct(
+        int $id_prestamo,
         float $pago_principal,
         float $pago_interes,
         float $pago_total,
         float $restante_pago_principal,
+        string $estado = 'pendiente',
         ?string $fecha_pago = null
     ) {
         $this->id = -1;
+        $this->id_prestamo = $id_prestamo;
         $this->pago_principal = $pago_principal;
         $this->pago_interes = $pago_interes;
         $this->pago_total = $pago_total;
         $this->restante_pago_principal = $restante_pago_principal;
+        $this->estado = $estado;
 
         $this->fecha_pago = $fecha_pago
             ? DateTime::createFromFormat('Y-m-d', $fecha_pago)
@@ -33,10 +40,12 @@ class Pago
     {
         return $this->fecha_pago->format("d-m-Y");
     }
-}
-?>
 
-<?php
+
+
+
+}
+
 class PagoRepositorio
 {
     private $conexion;
@@ -56,13 +65,13 @@ class PagoRepositorio
         $pagos = [];
         foreach ($resultados as $fila) {
             $pago = new Pago(
-                (float)$fila['pago_principal'],
-                (float)$fila['pago_interes'],
-                (float)$fila['pago_total'],
-                (float)$fila['restante_pago_principal'],
+                (float) $fila['pago_principal'],
+                (float) $fila['pago_interes'],
+                (float) $fila['pago_total'],
+                (float) $fila['restante_pago_principal'],
                 $fila['fecha_pago']
             );
-            $pago->id = (int)$fila['id'];
+            $pago->id = (int) $fila['id'];
             $pagos[] = $pago;
         }
         return $pagos;
@@ -77,13 +86,13 @@ class PagoRepositorio
 
         if ($fila) {
             $pago = new Pago(
-                (float)$fila['pago_principal'],
-                (float)$fila['pago_interes'],
-                (float)$fila['pago_total'],
-                (float)$fila['restante_pago_principal'],
+                (float) $fila['pago_principal'],
+                (float) $fila['pago_interes'],
+                (float) $fila['pago_total'],
+                (float) $fila['restante_pago_principal'],
                 $fila['fecha_pago']
             );
-            $pago->id = (int)$fila['id'];
+            $pago->id = (int) $fila['id'];
             return $pago;
         }
         return null;
@@ -97,9 +106,9 @@ class PagoRepositorio
 
         $stmt = $this->conexion->prepare(
             "INSERT INTO {$this->tabla_pagos} 
-            (id_prestamo, pago_principal, pago_interes, pago_total, restante_pago_principal, fecha_pago)
-            VALUES 
-            (:id_prestamo, :pago_principal, :pago_interes, :pago_total, :restante_pago_principal, :fecha_pago)"
+    (id_prestamo, pago_principal, pago_interes, pago_total, restante_pago_principal, fecha_pago, estado)
+    VALUES 
+    (:id_prestamo, :pago_principal, :pago_interes, :pago_total, :restante_pago_principal, :fecha_pago, :estado)"
         );
 
         $stmt->execute([
@@ -109,9 +118,10 @@ class PagoRepositorio
             'pago_total' => $pago->pago_total,
             'restante_pago_principal' => $pago->restante_pago_principal,
             'fecha_pago' => $pago->fecha_pago->format('Y-m-d'),
+            'estado' => $pago->estado
         ]);
 
-        $pago->id = (int)$this->conexion->lastInsertId();
+        $pago->id = (int) $this->conexion->lastInsertId();
         return $pago->id;
     }
 
@@ -128,38 +138,37 @@ class PagoRepositorio
 
 
     public function obtener_por_prestamo(Prestamo $prestamo): array
-{
-    if ($prestamo->id === -1) {
-        die("Préstamo no válido.");
-    }
+    {
+        if ($prestamo->id === -1) {
+            die("Préstamo no válido.");
+        }
 
-    $sql = "SELECT * 
+        $sql = "SELECT * 
             FROM {$this->tabla_pagos} 
             JOIN prestamos  ON pagos.id_prestamo = prestamos.id
             WHERE prestamos.id = :id_prestamo
             ORDER BY fecha_pago ASC";
 
-    $stmt = $this->conexion->prepare($sql);
-    $stmt->execute(['id_prestamo' => $prestamo->id]);
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute(['id_prestamo' => $prestamo->id]);
 
-    $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $pagos = [];
-    foreach ($resultados as $fila) {
-        $pago = new Pago(
-            (float)$fila['pago_principal'],
-            (float)$fila['pago_interes'],
-            (float)$fila['pago_total'],
-            (float)$fila['restante_pago_principal'],
-            $fila['fecha_pago']
-        );
-        $pago->id = (int)$fila['id'];
-        $pagos[] = $pago;
+        $pagos = [];
+        foreach ($resultados as $fila) {
+            $pago = new Pago(
+                (float) $fila['pago_principal'],
+                (float) $fila['pago_interes'],
+                (float) $fila['pago_total'],
+                (float) $fila['restante_pago_principal'],
+                $fila['fecha_pago']
+            );
+            $pago->id = (int) $fila['id'];
+            $pagos[] = $pago;
+        }
+
+        return $pagos;
     }
-
-    return $pagos;
-}
 
 }
 ?>
-

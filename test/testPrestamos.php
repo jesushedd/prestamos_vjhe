@@ -16,7 +16,7 @@ $prestamo = new Prestamo(
     $un_cliente,
     10000,
     60,
-    0.12
+    12
 );
 
 $id_prestamo = $prestamos_repo->crear($prestamo);
@@ -27,7 +27,8 @@ assert($prestamo_guardado->id === $id_prestamo);
 assert($prestamo_guardado->id_cliente === $un_cliente->id);
 assert($prestamo_guardado->monto === 10000.0);
 assert($prestamo_guardado->plazos === 60);
-assert($prestamo_guardado->interes_anual === 0.12);
+
+assert($prestamo_guardado->interes_anual === 12.0);
 assert($prestamo_guardado->estado === 'vigente');
 
 // Comprobamos que la fecha es igual (puede variar en formato, así que comparamos como string)
@@ -39,7 +40,7 @@ $prestamo = new Prestamo(
     $un_cliente,
     10000,
     60,
-    0.12
+    12
 );
 
 $id_prestamo = $prestamos_repo->crear($prestamo);
@@ -51,9 +52,16 @@ assert($prestamo_guardado->id === $id_prestamo);
 assert($prestamo_guardado->id_cliente === $un_cliente->id);
 assert($prestamo_guardado->monto === 10000.0);
 assert($prestamo_guardado->plazos === 60);
-assert($prestamo_guardado->interes_anual === 0.12);
+echo $prestamo_guardado->interes_anual;
+assert($prestamo_guardado->interes_anual == 12);
 assert($prestamo_guardado->estado === 'vigente');
 assert($prestamo_guardado->str_fecha_inicio() === $prestamo->str_fecha_inicio());
+?>
+<pre>
+    <?php print_r($prestamo_guardado->obtener_cronograma());?>
+</pre>
+<?php
+
 
 // === PRUEBA: obtener_por_cliente ===
 $prestamos_cliente = $prestamos_repo->obtener_por_cliente($un_cliente);

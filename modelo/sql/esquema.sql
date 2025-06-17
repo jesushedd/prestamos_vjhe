@@ -49,8 +49,10 @@ CREATE TABLE pagos (
     pago_principal DECIMAL(10,2) NOT NULL,
     pago_interes DECIMAL(10,2) NOT NULL,
     pago_total DECIMAL(10,2) NOT NULL,
-    restante_pago_principal DECIMAL(10,2) NOT NULL
-    fecha_pago DATE NOT NULL 
+    restante_pago_principal DECIMAL(10,2) NOT NULL,
+    fecha_pago DATE NOT NULL, 
+    estado ENUM('pendiente', 'pagado') NOT NULL
+
 );
 
 -- 7. Intereses

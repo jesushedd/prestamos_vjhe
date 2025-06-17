@@ -13,9 +13,8 @@
 
 namespace Phelix\LoanAmortization;
  require_once __DIR__ . '/Loan.php';
+ require_once __DIR__ . '/Utils.php';
 
-
-use SebastianBergmann\CodeCoverage\Util;
 
 final class ScheduleGenerator extends  Loan {
 

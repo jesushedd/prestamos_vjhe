@@ -1,6 +1,10 @@
 <?php
 
+use Phelix\LoanAmortization\ScheduleGenerator;
+
 require_once ROOT_DIR . 'modelo/ClienteModelo.php';
+
+require_once ROOT_DIR . 'modelo/PagoModelo.php';
 require_once ROOT_DIR . 'lib/loan/ScheduleGenerator.php';
 class Prestamo
 {
@@ -38,6 +42,20 @@ class Prestamo
     {
         return $this->fecha_inicio->format("d-m-Y");
     }
+
+    public function obtener_cronograma(): array
+    {
+        $interestCalculator = new ScheduleGenerator();
+        $interestCalculator
+            ->setPrincipal($this->monto)
+            ->setInterestRate($this->interes_anual, "yearly", ScheduleGenerator::INTEREST_ON_REDUCING_BALANCE) // note the interest type
+            ->setLoanDuration($this->plazos, "months")
+            ->setRepayment(1, 1, "months")
+            ->setAmortization(ScheduleGenerator::EVEN_PRINCIPAL_REPAYMENT) // note the amortization type
+            ->generate();
+        return $interestCalculator->amortization_schedule;
+    }
+
 }
 
 
@@ -47,6 +65,7 @@ class PrestamoRepositorio
     private $conexion;
     private ClienteRepositorio $clienteRepositorio;
     private string $tabla_prestamos = 'prestamos';
+    private string $tabla_pagos = 'pagos';
 
     public function __construct($conexion, ClienteRepositorio $clienteRepositorio)
     {
@@ -138,29 +157,58 @@ class PrestamoRepositorio
             die("El préstamo ya tiene un ID asignado.");
         }
 
-        $stmt = $this->conexion->prepare("
-        INSERT INTO {$this->tabla_prestamos} 
-        (id_cliente, monto, fecha_inicio, plazos, interes_anual, estado)
-        VALUES 
-        (:id_cliente, :monto, :fecha_inicio, :plazos, :interes_anual, :estado)
-    ");
+        try {
+            $this->conexion->beginTransaction();
+            //guardar en tabla prestamos
 
-        $stmt->execute([
-            'id_cliente' => $prestamo->id_cliente,
-            'monto' => $prestamo->monto,
-            'fecha_inicio' => $prestamo->fecha_inicio->format('Y-m-d'),
-            'plazos' => $prestamo->plazos,
-            'interes_anual' => $prestamo->interes_anual,
-            'estado' => $prestamo->estado
-        ]);
+            $stmt = $this->conexion->prepare("
+            INSERT INTO {$this->tabla_prestamos} 
+            (id_cliente, monto, fecha_inicio, plazos, interes_anual, estado)
+            VALUES 
+            (:id_cliente, :monto, :fecha_inicio, :plazos, :interes_anual, :estado)
+        ");
 
-        $prestamo->id = (int) $this->conexion->lastInsertId();
-        return $prestamo->id;
+            $stmt->execute([
+                'id_cliente' => $prestamo->id_cliente,
+                'monto' => $prestamo->monto,
+                'fecha_inicio' => $prestamo->fecha_inicio->format('Y-m-d'),
+                'plazos' => $prestamo->plazos,
+                'interes_anual' => $prestamo->interes_anual,
+                'estado' => $prestamo->estado
+            ]);
+
+            $prestamo->id = (int) $this->conexion->lastInsertId();
+            //guardar el cronograma de pagos en tabla pagos
+
+            $cronograma = $prestamo->obtener_cronograma();
+            $pagos_repo = new PagoRepositorio($this->conexion);
+
+            foreach ($cronograma as $letra) {
+                $pago = new Pago(
+                    $prestamo->id,
+                    $letra['principal_repayment'],
+                    $letra['interest_repayment'],
+                    $letra['total_amount_repayment'],
+                    $letra['principal_repayment_balance'],
+                    'pendiente',
+                    $letra['repayment_date']
+                );
+
+                $pagos_repo->crear($pago);
+            }
+
+
+            $this->conexion->commit();
+            return $prestamo->id;
+
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            $prestamo->id = -1;
+            throw new Exception("Error al crear el préstamo: " . $e->getMessage());
+        }
     }
 
-    public function get_cronograma()
-    {
 
-    }
+
 
 }
