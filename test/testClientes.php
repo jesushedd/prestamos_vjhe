@@ -80,3 +80,7 @@ assert($cliente_actualizado->apellido === "López");
 assert($cliente_actualizado->dni === $dni); // no debe cambiar
 assert($cliente_actualizado->email === "anita@correo.com");
 assert($cliente_actualizado->str_fecha() === "15-06-2024");
+
+//Verificar q el cliente id 3 existe
+$cliente_3 = $repo_clientes ->obtenerPorId(3);
+assert($cliente_3 !== null);
