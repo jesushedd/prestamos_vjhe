@@ -33,17 +33,24 @@ CREATE TABLE IF NOT EXISTS  usuarios (
 CREATE TABLE prestamos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL REFERENCES clientes(id),
-    monto DECIMAL(10,2),
-    fecha_inicio DATE,
-    fecha_fin DATE
+    monto DECIMAL(10,2) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    plazos INT UNSIGNED NOT NULL,
+    interes_anual DECIMAL(4,2) NOT NULL,
+    estado ENUM('vigente', 'pagado', 'atrasado') NOT NULL
 );
+
+
 
 -- 6. Pagos
 CREATE TABLE pagos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     id_prestamo INT NOT NULL REFERENCES prestamos(id),
-    fecha_pago DATE,
-    monto_pago DECIMAL(10,2)
+    pago_principal DECIMAL(10,2) NOT NULL,
+    pago_interes DECIMAL(10,2) NOT NULL,
+    pago_total DECIMAL(10,2) NOT NULL,
+    restante_pago_principal DECIMAL(10,2) NOT NULL
+    fecha_pago DATE NOT NULL 
 );
 
 -- 7. Intereses
