@@ -30,3 +30,10 @@ VALUES (2, 'asist_nombre', 'asist_apellido','asist_dni');
 
 INSERT INTO usuarios (id, id_tipo_usuario, nombre_usuario, password) VALUES
 (2,2, 'asist','$2y$10$TKmLddFkCv5Sh3QlrnOoE.CswYnBVwYNNy7mIZbz7S8W2cENMNGGu');
+
+--Crear Plazos y tasas por defecto
+INSERT INTO plazos(numero_plazos, tasa)
+VALUES 
+(6, 10),
+(12, 15),
+(18,20);

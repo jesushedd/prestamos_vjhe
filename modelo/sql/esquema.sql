@@ -55,12 +55,10 @@ CREATE TABLE pagos (
 
 );
 
--- 7. Intereses
-CREATE TABLE intereses (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY  KEY,
-    id_prestamo INT NOT NULL REFERENCES prestamos(id),
-    tasa DECIMAL(5,2),
-    fecha_aplicacion DATE
+-- 7. Plazos - intereses
+CREATE TABLE plazos (
+    tasa DECIMAL(5,2) NOT NULL,
+    numero_plazos INT NOT NULL PRIMARY  KEY
 );
 
 -- 8. Reportes (si aplican)
