@@ -49,7 +49,8 @@ function get_prestamos() {
     if (ID_ENTIDAD_SELECCIONADA) {
 
         let form = new FormData();
-        form.append('id', ID_ENTIDAD_SELECCIONADA);
+        form.append('id_cliente', ID_ENTIDAD_SELECCIONADA);
+        form.append('accion', 'listar');
         const response = fetch(
             RUTA,
             {
