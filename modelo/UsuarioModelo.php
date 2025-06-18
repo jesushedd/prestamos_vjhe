@@ -37,7 +37,8 @@ class Usuario
         $this->tipo_usuario = $tipo_usuario;
     }
 
-    public function set_password(string $pssws){
+    public function set_password(string $pssws)
+    {
         $this->password = password_hash($pssws, PASSWORD_DEFAULT);
     }
 }
@@ -145,6 +146,21 @@ class UsuarioRepositorio
         return $tipos;
     }
 
+    public function obtener_tipo_por_nombre(string $nombre): TipoUsuario|null
+    {
+        $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_tipo_usuarios WHERE nombre_tipo = :nombre");
+        $stmt->execute(['nombre' => $nombre]);
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($resultado) {
+            $tipo = new TipoUsuario($resultado['nombre_tipo']);
+            $tipo->id = $resultado['id'];
+            return $tipo;
+        }
+
+        return null;
+    }
+
     public function obtener_usuario_por_id(int $id): Usuario|null
     {
         $stmt = $this->conexion->prepare("SELECT * FROM $this->tabla_usuario
@@ -239,7 +255,7 @@ class UsuarioRepositorio
         }
     }
 
-    
+
 
     public function actualizar(Usuario $usuario): bool
     {
@@ -258,28 +274,33 @@ class UsuarioRepositorio
             $stmt->execute([
                 'nombre' => $usuario->nombre,
                 'apellido' => $usuario->apellido,
-                'dni' => $usuario->dni
+                'dni' => $usuario->dni,
+                'id' => $usuario->id
             ]);
-            if ($stmt->rowCount() != 1) {
+            echo $stmt->rowCount() ;
+            /*if ($stmt->rowCount() != 1) {
                 $this->conexion->rollBack();
+                print_r($usuario);
                 echo ("Error al match id del usuario a actualizar");
                 return false;
-            }
+            }*/
             //actualizar tipo de usuario
 
 
             $stmt = $this->conexion->prepare("UPDATE $this->tabla_usuario  
-                                            SET id_tipo_usuario=:id_tipo
+                                            SET id_tipo_usuario=:id_tipo, nombre_usuario=:nombre_u
                                             WHERE id=:id_usuario");
             $stmt->execute([
                 'id_usuario' => $usuario->id,
+                'nombre_u' => $usuario->nombre_usuario,
                 'id_tipo' => $usuario->tipo_usuario->id
             ]);
-            if ($stmt->rowCount() != 1) {
+            /*if ($stmt->rowCount() != 1) {
+                print_r($usuario);
                 $this->conexion->rollBack();
-                echo ("Error al match id del usuario a actualizar");
-                return false;
-            }
+                die ("Error al match id del usuario a actualizarRR");
+                
+            }*/
 
             $this->conexion->commit();
 
