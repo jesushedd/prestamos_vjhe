@@ -9,7 +9,10 @@ $CONTROLADOR_DIR = ROOT_DIR . 'controlador/';
 
 
 
-switch ($request) {
+$request = parse_url($request);
+$path = $request['path'];
+
+switch ($path) {
     case ROOT_ROUTE:
         echo "Hola munda";
         break;
@@ -28,12 +31,16 @@ switch ($request) {
     case ROOT_ROUTE . 'prestamos':
         require $CONTROLADOR_DIR . 'prestamosController.php';
         break;
+    case ROOT_ROUTE . 'prestamos/nuevo':
+        require $CONTROLADOR_DIR . 'prestamosController.php';
+        break;
     case ROOT_ROUTE . 'usuarios':
         require $CONTROLADOR_DIR . 'usuariosController.php';
         break;
 
     default:
-        echo $request;
+        echo $path;
+        
 }
 
 
