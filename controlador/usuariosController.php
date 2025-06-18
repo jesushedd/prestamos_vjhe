@@ -7,6 +7,9 @@ require_once ROOT_DIR . 'config/conexion.php';
 
 require_once $CONFIG . 'init.php';
 
+
+$repo_usuarios = new UsuarioRepositorio(conectar());
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     
@@ -14,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         header("Location:  " . ROOT_ROUTE . 'home');
     }
 
-    $repo_usuarios = new UsuarioRepositorio(conectar());
+    
     $USUARIOS = $repo_usuarios->obtener_todos();
     $TIPOS = $repo_usuarios->obtener_tipos();
 
@@ -25,16 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['accion'] === 'Guardar') {
     //cchecar el tipo de usuario
     $usuario = unserialize($_SESSION['usuario']);
 
     if ($usuario->tipo_usuario->nombre_tipo !== ADMINISTRADOR) {
         header("Location:  " . ROOT_ROUTE . 'home');
     }
-
-    $repo_usuarios = new UsuarioRepositorio(conectar());
-
 
     //obtener datos del form
 
@@ -49,6 +49,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario->set_password($_POST['password']);
 
     $repo_usuarios->crear($usuario);
+
+    header("Location:  " . ROOT_ROUTE . 'usuarios');
+
+
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['accion'] === 'Actualizar') {
+    //cchecar el tipo de usuario
+    $usuario = unserialize($_SESSION['usuario']);
+
+    if ($usuario->tipo_usuario->nombre_tipo !== ADMINISTRADOR) {
+        header("Location:  " . ROOT_ROUTE . 'home');
+    }
+
+    //obtener datos del form
+
+    $usuario = $repo_usuarios->obtener_usuario_por_id((int) $_POST['editando_id']);
+
+    $usuario->nombre_usuario = $_POST['editando_nombre_usuario'];
+    $usuario->nombre = $_POST['editando_nombre'];
+    $usuario->apellido = $_POST['editando_apellido'];
+    $usuario->dni = $_POST['editando_dni'];
+    $usuario->tipo_usuario = $repo_usuarios->obtener_tipo_por_nombre( $_POST['editando_tipo']);
+    
+    $repo_usuarios->actualizar($usuario);
 
     header("Location:  " . ROOT_ROUTE . 'usuarios');
 

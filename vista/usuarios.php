@@ -71,7 +71,7 @@
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <input class="btn btn-success" type="submit" value="Guardar Usuario" placeholder="Guardar Usuario" name="operacion">
+                                <input class="btn btn-success" type="submit" value="Guardar"  name="accion">
                                 
                             </form>
                         </div>
@@ -120,7 +120,7 @@
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                 <input class="btn btn-warning" type="submit" value="Actualizar Usuario" placeholder="Guardar Usuario" name="operacion">
+                                 <input class="btn btn-warning" type="submit" value="Actualizar" name="accion">
                             </form>
                         </div>
                     </div>
