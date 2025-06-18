@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['accion'] === 'Actualizar') {
     //cchecar el tipo de usuario
     $usuario = unserialize($_SESSION['usuario']);
 
@@ -53,5 +53,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     header("Location:  " . ROOT_ROUTE . 'clientes');
 
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['accion'] === 'Guardar') {
+    //cchecar el tipo de usuario
+    $usuario = unserialize($_SESSION['usuario']);
+
+    if ($usuario->tipo_usuario->nombre_tipo !== ADMINISTRADOR) {
+         header("Location:  " . ROOT_ROUTE . 'home');
+    } 
+
+    
+    //obtener datos del form
+    $cliente = new Cliente(
+        $_POST['nombre'],
+        $_POST['apellido'],
+        $_POST['dni'],
+        $_POST['email'],
+        $_POST['direccion'],
+        $_POST['telefono']
+    );
+
+
+
+    $repo_clientes->crear($cliente);
+
+    header("Location:  " . ROOT_ROUTE . 'clientes');
 
 }
