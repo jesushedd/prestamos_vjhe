@@ -30,11 +30,7 @@
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="fecha_creacion" class="form-label">Fecha de creación</label>
-                                <input type="date" class="form-control" id="fecha_creacion" name="fecha_creacion"
-                                    required>
-                            </div>
+            
                             <div class="mb-3">
                                 <label for="direccion" class="form-label">Dirección</label>
                                 <input type="text" class="form-control" id="direccion" name="direccion" required>
@@ -43,7 +39,7 @@
                                 <label for="telefono" class="form-label">Teléfono</label>
                                 <input type="text" class="form-control" id="telefono" name="telefono" required>
                             </div>
-                            <button type="submit" class="btn btn-success">Guardar Cliente</button>
+                            <input type="submit" class="btn btn-success" value="Guardar" name="accion">
                         </form>
                     </div>
                 </div>
@@ -95,7 +91,7 @@
                                     name="editando_telefono" required>
                             </div>
 
-                            <button type="submit" class="btn btn-warning">Actualizar Cliente</button>
+                            <input value="Actualizar" type="submit" class="btn btn-warning" name="accion">
                         </form>
                     </div>
                 </div>
@@ -133,6 +129,7 @@
                 <th>Fecha de creación</th>
                 <th>Dirección</th>
                 <th>Teléfono</th>
+                <th></th>
             </tr>
         </thead>
         <tbody class="clase-1">
@@ -146,6 +143,7 @@
                     <td><?= htmlspecialchars($cliente->str_fecha()) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->direccion) ?></td>
                     <td class="editable"><?= htmlspecialchars($cliente->telefono) ?></td>
+                    <td><a class="btn btn-success " href=<?= ROOT_ROUTE . "prestamos/nuevo?id_cliente=$cliente->id" ?>>Nuevo Préstamo</a></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
