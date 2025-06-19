@@ -53,7 +53,20 @@ class Prestamo
             ->setRepayment(1, 1, "months")
             ->setAmortization(ScheduleGenerator::EVEN_PRINCIPAL_REPAYMENT) // note the amortization type
             ->generate();
-        return $interestCalculator->amortization_schedule;
+        $schedule = $interestCalculator->amortization_schedule;
+        $cronograma = [];
+        foreach ($schedule as $letra) {
+            $cronograma[] = [
+                'pago_principal' => $letra['principal_repayment'],
+                'pago_interes' => $letra['interest_repayment'],
+                'pago_total' => $letra['total_amount_repayment'],
+                'restante_pago_principal' => $letra['principal_repayment_balance'],
+                'fecha_pago' => $letra['repayment_date']
+            ];
+
+        }
+
+        return $cronograma;
     }
 
 }
@@ -186,12 +199,12 @@ class PrestamoRepositorio
             foreach ($cronograma as $letra) {
                 $pago = new Pago(
                     $prestamo->id,
-                    $letra['principal_repayment'],
-                    $letra['interest_repayment'],
-                    $letra['total_amount_repayment'],
-                    $letra['principal_repayment_balance'],
+                    $letra['pago_principal'],
+                    $letra['pago_interes'],
+                    $letra['pago_total'],
+                    $letra['restante_pago_principal'],
                     'pendiente',
-                    $letra['repayment_date']
+                    $letra['fecha_pago']
                 );
 
                 $pagos_repo->crear($pago);
